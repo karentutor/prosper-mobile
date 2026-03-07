@@ -1,21 +1,16 @@
 import React from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { HomeScreen } from "@/components/screens/HomeScreen";
-import { clearAuthSession } from "@/lib/authStorage";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function HomeRoute() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ email?: string }>();
-
-  const email =
-    typeof params.email === "string" && params.email.length > 0
-      ? params.email
-      : "test@test.com";
+  const { user, signOut } = useAuth();
 
   async function handleLogout() {
-    await clearAuthSession();
+    await signOut();
     router.replace("/");
   }
 
-  return <HomeScreen email={email} onLogout={handleLogout} />;
+  return <HomeScreen email={user?.email ?? ""} onLogout={handleLogout} />;
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -15,14 +14,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { loginSchema, type LoginValues } from "@/validation/auth";
 import { loginRequest } from "@/lib/authApi";
-import { saveAuthSession } from "@/lib/authStorage";
+import { useAuth } from "@/lib/AuthContext";
 
 type Props = {
-  onLoginSuccess: (email: string) => void;
+  onLoginSuccess: () => void;
   onGoToRegister: () => void;
 };
 
 export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
+  const { signIn } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -44,10 +45,8 @@ export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
       const emailNormalized = values.email.trim().toLowerCase();
       const result = await loginRequest(emailNormalized, values.password);
 
-      await saveAuthSession(result.access_token, result.user);
-
-      Alert.alert("Login Successful", `Logged in as ${result.user.email}`);
-      onLoginSuccess(result.user.email);
+      await signIn(result.access_token, result.user);
+      onLoginSuccess();
     } catch (error: any) {
       const message =
         error?.response?.data?.message ||

@@ -13,7 +13,7 @@ export function HomeScreen({ email, onLogout }: Props) {
       <View className="flex-1 items-center justify-center px-6">
         <Text className="mb-2 text-4xl font-bold">PROSPER</Text>
         <Text className="mb-8 text-base text-gray-600">
-          Logged in as {email}
+          {email ? `Logged in as ${email}` : "Logged in"}
         </Text>
 
         <Pressable

@@ -8,11 +8,10 @@ export default function RegisterRoute() {
   return (
     <RegisterScreen
       onRegisterSuccess={() => {
-        // After registering, send them back to login
-        router.replace("/");
+        router.replace("/home");
       }}
       onGoToLogin={() => {
-        router.replace("/");
+        router.replace("/login");
       }}
     />
   );

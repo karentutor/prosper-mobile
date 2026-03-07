@@ -2,13 +2,13 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { LoginScreen } from "@/components/screens/LoginScreen";
 
-export default function Index() {
+export default function LoginRoute() {
   const router = useRouter();
 
   return (
     <LoginScreen
-      onLoginSuccess={(email) => {
-        router.replace({ pathname: "/home", params: { email } });
+      onLoginSuccess={() => {
+        router.replace("/home");
       }}
       onGoToRegister={() => {
         router.push("/register");

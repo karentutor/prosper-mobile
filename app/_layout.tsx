@@ -1,60 +1,32 @@
 import "../global.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Slot, useRouter, useSegments } from "expo-router";
-import { getAccessToken } from "@/lib/authStorage";
+import { Slot, usePathname, useRouter } from "expo-router";
+import { AuthProvider, useAuth } from "@/lib/AuthContext";
 
-export default function RootLayout() {
+function AppNavigator() {
   const router = useRouter();
-  const segments = useSegments();
-
-  const [isReady, setIsReady] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const pathname = usePathname();
+  const { isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    let isMounted = true;
+    if (isLoading) return;
 
-    async function bootstrap() {
-      try {
-        const token = await getAccessToken();
+    const inAuth = pathname === "/login" || pathname === "/register";
+    const inApp = pathname === "/home";
 
-        if (!isMounted) return;
-
-        setIsAuthenticated(!!token);
-      } finally {
-        if (isMounted) {
-          setIsReady(true);
-        }
-      }
-    }
-
-    bootstrap();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isReady || isAuthenticated === null) {
-      return;
-    }
-
-    const inAuthGroup = segments[0] === "(auth)";
-    const inAppGroup = segments[0] === "(app)";
-
-    if (!isAuthenticated && inAppGroup) {
+    if (!isAuthenticated && inApp) {
       router.replace("/");
       return;
     }
 
-    if (isAuthenticated && inAuthGroup) {
+    if (isAuthenticated && (pathname === "/" || inAuth)) {
       router.replace("/home");
     }
-  }, [isReady, isAuthenticated, segments, router]);
+  }, [isLoading, isAuthenticated, pathname, router]);
 
-  if (!isReady) {
+  if (isLoading) {
     return (
       <SafeAreaProvider>
         <View className="flex-1 items-center justify-center bg-white">
@@ -68,5 +40,13 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <Slot />
     </SafeAreaProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
   );
 }
