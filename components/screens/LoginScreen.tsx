@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginValues } from "@/validation/auth";
 import { loginRequest } from "@/lib/authApi";
 import { useAuth } from "@/lib/AuthContext";
+import { getApiErrorMessage } from "@/lib/errors";
 
 type Props = {
   onLoginSuccess: () => void;
@@ -23,6 +24,7 @@ type Props = {
 
 export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
   const { signIn } = useAuth();
+  const passwordRef = useRef<TextInput>(null);
 
   const {
     control,
@@ -47,12 +49,8 @@ export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
 
       await signIn(result.access_token, result.user);
       onLoginSuccess();
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Login failed";
-
+    } catch (error) {
+      const message = getApiErrorMessage(error, "Login failed");
       setError("password", {
         type: "server",
         message,
@@ -84,6 +82,7 @@ export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
                 autoComplete="email"
                 textContentType="emailAddress"
                 returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -102,6 +101,7 @@ export function LoginScreen({ onLoginSuccess, onGoToRegister }: Props) {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
+                ref={passwordRef}
                 className="mb-2 rounded-xl border border-gray-300 px-4 py-3"
                 placeholder="••••••••"
                 secureTextEntry

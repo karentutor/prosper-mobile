@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from "react";
 import {
   clearAuthSession,
   getAccessToken,
@@ -41,29 +41,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     bootstrap();
   }, []);
 
-  async function signIn(nextToken: string, nextUser: AuthUser) {
-    await saveAuthSession(nextToken, nextUser);
-    setToken(nextToken);
-    setUser(nextUser);
-  }
+const signIn = useCallback(async (nextToken: string, nextUser: AuthUser) => {
+  await saveAuthSession(nextToken, nextUser);
+  setToken(nextToken);
+  setUser(nextUser);
+}, []);
 
-  async function signOut() {
-    await clearAuthSession();
-    setToken(null);
-    setUser(null);
-  }
+const signOut = useCallback(async () => {
+  await clearAuthSession();
+  setToken(null);
+  setUser(null);
+}, []);
 
-  const value = useMemo(
-    () => ({
-      user,
-      token,
-      isLoading,
-      isAuthenticated: !!token && !!user,
-      signIn,
-      signOut,
-    }),
-    [user, token, isLoading]
-  );
+const value = useMemo(
+  () => ({
+    user,
+    token,
+    isLoading,
+    isAuthenticated: !!token && !!user,
+    signIn,
+    signOut,
+  }),
+  [user, token, isLoading, signIn, signOut]
+);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

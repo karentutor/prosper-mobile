@@ -15,6 +15,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterValues } from "@/validation/auth";
 import { registerRequest } from "@/lib/authApi";
 import { useAuth } from "@/lib/AuthContext";
+import { getApiErrorMessage } from "@/lib/errors";
+
+
 
 type Props = {
   onRegisterSuccess: () => void;
@@ -54,16 +57,12 @@ export function RegisterScreen({ onRegisterSuccess, onGoToLogin }: Props) {
 
       await signIn(result.access_token, result.user);
       onRegisterSuccess();
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Registration failed";
-
-      setError("email", {
-        type: "server",
-        message,
-      });
+} catch (error) {
+  const message = getApiErrorMessage(error, "Registration failed");
+  setError("root", {
+    type: "server",
+    message,
+  });
     }
   };
 
@@ -78,6 +77,11 @@ export function RegisterScreen({ onRegisterSuccess, onGoToLogin }: Props) {
           <Text className="mb-8 text-gray-600">
             Create your Prosper account.
           </Text>
+
+          {errors.root?.message && (
+  <Text className="mb-4 text-red-600">{errors.root.message}</Text>
+)}
+
 
           <Text className="mb-2 text-sm font-semibold">First name</Text>
           <Controller

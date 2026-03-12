@@ -32,12 +32,7 @@ export async function registerRequest(
   return response.data;
 }
 
-export async function getMe(token: string): Promise<AuthUser> {
-  const response = await api.get<AuthUser>("/auth/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+export async function getMe(): Promise<AuthUser> {
+  const response = await api.get<AuthUser>("/auth/me");
   return response.data;
 }
