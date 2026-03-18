@@ -1,3 +1,4 @@
+// app/(app)/settings.tsx
 import React from "react";
 import { useRouter } from "expo-router";
 import { SettingsScreen } from "@/components/screens/SettingsScreen";
@@ -9,11 +10,12 @@ export default function SettingsRoute() {
 
   async function handleLogout() {
     await signOut();
-router.replace({ pathname: "/" as any });  }
+    // no router.replace here
+  }
 
   return (
     <SettingsScreen
-      onNavigateHome={() => router.replace("/(app)/home")}
+      onNavigateHome={() => router.replace("/home")}
       onLogout={handleLogout}
     />
   );
