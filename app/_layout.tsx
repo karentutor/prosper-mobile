@@ -20,14 +20,14 @@ function AppNavigator() {
   }
 
   const inAuth = pathname === "/login" || pathname === "/register";
-  const inApp = pathname === "/home";
-
+const inApp = pathname === "/home" || pathname === "/settings";
+ 
   if (!isAuthenticated && inApp) {
     return <Redirect href="/" />;
   }
 
   if (isAuthenticated && (pathname === "/" || inAuth)) {
-    return <Redirect href="/home" />;
+  return <Redirect href="/(app)/home" />;
   }
 
   return (

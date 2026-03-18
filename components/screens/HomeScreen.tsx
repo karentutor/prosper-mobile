@@ -1,28 +1,34 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { HealthCard } from "@/components/cards/HealthCard";
+import { Header } from "@/components/Header";
 
 type Props = {
   email: string;
   onLogout: () => void | Promise<void>;
+  onNavigateSettings: () => void;
 };
 
-export function HomeScreen({ email, onLogout }: Props) {
+export function HomeScreen({ email, onLogout, onNavigateSettings }: Props) {
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="mb-2 text-4xl font-bold">PROSPER</Text>
-        <Text className="mb-8 text-base text-gray-600">
-          {email ? `Logged in as ${email}` : "Logged in"}
-        </Text>
-
-        <Pressable
-          onPress={onLogout}
-          className="rounded-xl bg-black px-6 py-4"
-        >
-          <Text className="font-semibold text-white">Log out</Text>
-        </Pressable>
-      </View>
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+      <Header
+        title="PROSPER"
+        menuItems={[
+          { label: "🏠  Home", onPress: () => {} },
+          { label: "⚙️  Settings", onPress: onNavigateSettings },
+          { label: "Log out", onPress: onLogout, destructive: true },
+        ]}
+      />
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <View className="items-center px-6 pt-8">
+          <Text className="text-sm text-gray-500">
+            {email ? `Logged in as ${email}` : "Logged in"}
+          </Text>
+        </View>
+        <HealthCard />
+      </ScrollView>
     </SafeAreaView>
   );
 }

@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "prosper",
-    "slug": "prosper",
+    "name": "igybuddy",
+    "slug": "igybuddy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "prosper",
+    "scheme": "igybuddy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.karentutor.prosper",
+      "bundleIdentifier": "com.karentutor.igybuddy",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -48,8 +48,8 @@
       [
         "react-native-health",
         {
-          "healthSharePermission": "Prosper reads your heart rate from Apple Health to show your latest heart rate in the app.",
-          "healthUpdatePermission": "Prosper does not write health data. This is used only for permission messaging."
+          "healthSharePermission": "igybuddy reads your heart rate from Apple Health.",
+          "healthUpdatePermission": "igybuddy does not write health data."
         }
       ]
     ],
@@ -60,8 +60,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "eef4336a-f648-4f34-adaa-f00720aa6475"
+        "projectId": "cf9aea35-c09b-4c43-8757-9ce7bf2adfe9"
       }
-    }
+    },
+    "owner": "karentutor"
   }
 }
