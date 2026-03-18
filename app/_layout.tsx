@@ -19,16 +19,17 @@ function AppNavigator() {
     );
   }
 
-const inAuth = pathname === "/" || pathname === "/login" || pathname === "/register";
-const inApp = pathname === "/home" || pathname === "/settings";
+  const inAuth =
+    pathname === "/" || pathname === "/login" || pathname === "/register";
+  const inApp = pathname === "/home" || pathname === "/settings";
 
-if (!isAuthenticated && inApp) {
-  return <Redirect href="/" />;
-}
+  if (!isAuthenticated && inApp) {
+    return <Redirect href="/" />;
+  }
 
-if (isAuthenticated && inAuth) {
-  return <Redirect href="/home" />;
-}
+  if (isAuthenticated && inAuth) {
+    return <Redirect href="/home" />;
+  }
 
   return (
     <SafeAreaProvider>

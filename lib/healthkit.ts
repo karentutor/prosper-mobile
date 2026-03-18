@@ -1,7 +1,4 @@
-import AppleHealthKit, {
-  HealthKitPermissions,
-  HealthValue,
-} from "react-native-health";
+import type { HealthKitPermissions, HealthValue } from "react-native-health";
 import { Platform } from "react-native";
 
 export type HeartRateSample = {
@@ -15,12 +12,29 @@ export type HealthKitStatus =
   | "connected"
   | "error";
 
-const PERMISSIONS: HealthKitPermissions = {
-  permissions: {
-    read: [AppleHealthKit.Constants.Permissions.HeartRate],
-    write: [],
-  },
-};
+function getAppleHealthKit() {
+  if (Platform.OS !== "ios") {
+    return null;
+  }
+
+  const mod = require("react-native-health");
+  return mod.default ?? mod;
+}
+
+function getPermissions(): HealthKitPermissions {
+  const AppleHealthKit = getAppleHealthKit();
+
+  if (!AppleHealthKit) {
+    throw new Error("HealthKit is only available on iOS.");
+  }
+
+  return {
+    permissions: {
+      read: [AppleHealthKit.Constants.Permissions.HeartRate],
+      write: [],
+    },
+  };
+}
 
 export function isHealthKitAvailable(): boolean {
   return Platform.OS === "ios";
@@ -28,47 +42,73 @@ export function isHealthKitAvailable(): boolean {
 
 export function requestHeartRatePermission(): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (!isHealthKitAvailable()) {
-      reject(new Error("HealthKit is only available on iOS."));
-      return;
-    }
-    AppleHealthKit.initHealthKit(PERMISSIONS, (err) => {
-      if (err) {
-        reject(new Error(err));
-      } else {
-        resolve();
+    try {
+      const AppleHealthKit = getAppleHealthKit();
+
+      if (!AppleHealthKit) {
+        reject(new Error("HealthKit is only available on iOS."));
+        return;
       }
-    });
+
+      const permissions = getPermissions();
+
+      AppleHealthKit.initHealthKit(permissions, (err: unknown) => {
+        if (err) {
+          reject(new Error(String(err)));
+          return;
+        }
+
+        resolve();
+      });
+    } catch (err) {
+      reject(err instanceof Error ? err : new Error(String(err)));
+    }
   });
 }
 
 export function fetchLatestHeartRate(): Promise<HeartRateSample | null> {
   return new Promise((resolve, reject) => {
-    if (!isHealthKitAvailable()) {
-      reject(new Error("HealthKit is only available on iOS."));
-      return;
+    try {
+      const AppleHealthKit = getAppleHealthKit();
+
+      if (!AppleHealthKit) {
+        reject(new Error("HealthKit is only available on iOS."));
+        return;
+      }
+
+      const endDate = new Date();
+      const startDate = new Date(
+        endDate.getTime() - 30 * 24 * 60 * 60 * 1000
+      );
+
+      AppleHealthKit.getHeartRateSamples(
+        {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          ascending: false,
+          limit: 1,
+        },
+        (err: unknown, results: HealthValue[]) => {
+          if (err) {
+            reject(new Error(String(err)));
+            return;
+          }
+
+          if (!results || results.length === 0) {
+            resolve(null);
+            return;
+          }
+
+          const latest = results[0];
+
+          resolve({
+            value: Math.round(latest.value),
+            startDate: latest.startDate,
+          });
+        }
+      );
+    } catch (err) {
+      reject(err instanceof Error ? err : new Error(String(err)));
     }
-
-    const options = {
-      unit: "bpm" as const,
-      ascending: false,
-      limit: 1,
-    };
-
-    AppleHealthKit.getHeartRateSamples(options, (err, results: HealthValue[]) => {
-      if (err) {
-        reject(new Error(String(err)));
-        return;
-      }
-      if (!results || results.length === 0) {
-        resolve(null);
-        return;
-      }
-      const latest = results[0];
-      resolve({
-        value: Math.round(latest.value),
-        startDate: latest.startDate,
-      });
-    });
   });
 }
